@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './module/auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CustomLogger } from './common/logger/custom.logger';
+import { StudentsModule } from './students/students.module';
+import { StatisticsModule } from './statistika/statistika.module';
 
 @Module({
   imports: [
@@ -19,8 +21,10 @@ import { CustomLogger } from './common/logger/custom.logger';
       autoLoadEntities: true,
       logging: ['error', "info", "warn"]
     }),
-    
-    AuthModule,  ],
+    StudentsModule,
+    AuthModule,
+    StatisticsModule
+   ],
   controllers: [],
   providers: [
     CustomLogger
