@@ -26,7 +26,6 @@ export class StudentsService {
     return student;
   }
 
-
   async update(id: number, dto: UpdateStudentDto) {
     const student = await this.findOne(id);
     Object.assign(student, dto);
