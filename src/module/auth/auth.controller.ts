@@ -19,9 +19,10 @@ import {
   ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
 import { AuthGuard } from "src/common/guards/auth-guard";
-import { RolesGuard } from "src/common/guards/roles.guard";
+
 import { Roles } from "src/common/decorators/roles.decorator";
 import { UserRole } from "src/common/constants/role";
+import { RolesGuard } from "src/common/guards/roles-guard";
 
 @ApiTags("Auth")
 @Controller("auth")

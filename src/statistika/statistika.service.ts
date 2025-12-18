@@ -1,10 +1,18 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  Body,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  Param,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, Between } from "typeorm";
 import { Student } from "../students/entities/student.entity";
+import { UserRole } from "src/common/constants/role";
 
 @Injectable()
 export class StatisticsService {
+  StudentsService: any;
   constructor(
     @InjectRepository(Student)
     private readonly studentRepo: Repository<Student>
@@ -44,18 +52,20 @@ export class StatisticsService {
     };
   }
 
-  // Soft delete / remove student
- async remove(id: number) {
-  const student = await this.studentRepo.findOne({ where: { id } });
-  if (!student) throw new NotFoundException("Student not found");
+async remove(id: string, userRole: UserRole) {
 
-  
-  await this.studentRepo.update(id, {
-    isActive: false,
-    deletedAt: new Date(),
-  });
+if (userRole !== UserRole.ADMIN && userRole !== UserRole.SUPER_ADMIN) {
+  throw new ForbiddenException("Sizda ruxsat yo'q");
+}
+  const student = await this.studentRepo.findOneBy({ id: +id }); // string -> number
 
-  
-  return this.studentRepo.findOne({ where: { id } });
-}
-}
+  if (!student) {
+    throw new NotFoundException("Student topilmadi");
+  }
+
+  // Soft delete
+  student.isActive = false;
+  student.deletedAt = new Date();
+
+  return this.studentRepo.save(student);
+}}

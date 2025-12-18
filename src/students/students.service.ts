@@ -1,15 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Student } from './entities/student.entity';
-import { CreateStudentDto } from './dto/create-student.dto';
-import { UpdateStudentDto } from './dto/update-student.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Student } from "./entities/student.entity";
+import { CreateStudentDto } from "./dto/create-student.dto";
+import { UpdateStudentDto } from "./dto/update-student.dto";
 
 @Injectable()
 export class StudentsService {
   constructor(
     @InjectRepository(Student)
-    private studentRepo: Repository<Student>,
+    private studentRepo: Repository<Student>
   ) {}
 
   async create(dto: CreateStudentDto) {
@@ -20,9 +24,13 @@ export class StudentsService {
     return this.studentRepo.find();
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<Student> {
+    if (!id) {
+      throw new BadRequestException("ID is required and must be a number");
+    }
+
     const student = await this.studentRepo.findOne({ where: { id } });
-    if (!student) throw new NotFoundException('Student not found');
+    if (!student) throw new NotFoundException("Student not found");
     return student;
   }
 
@@ -32,12 +40,10 @@ export class StudentsService {
     return this.studentRepo.save(student);
   }
 
-
   async remove(id: number) {
-  const student = await this.findOne(id); 
-  student.isActive = false;
-  student.deletedAt = new Date(); 
-  return this.studentRepo.save(student);
-}
-
+    const student = await this.findOne(id);
+    student.isActive = false;
+    student.deletedAt = new Date();
+    return this.studentRepo.save(student);
+  }
 }
